@@ -1,82 +1,82 @@
-* {
+html, body {
+    height: 100%;
     margin: 0;
-    padding: 0;
-}
-
-body {
     font-family: Arial, sans-serif;
-    background-color: #A9D6E5;
+    background-image: url("/public/img/bgg.jpg");
+    background-position: right;
 }
-
-#container_pc {
-    width: 70%;
-    margin: 0 auto;
+#main_page_link{
+    color: black;
+    text-decoration: none;
 }
-
-#banner {
-    background-color: #E3E3E3;
-    color: white;
-    padding: 20px;
-    text-align: center;
-    border-radius: 8px 8px 0 0;
-}
-
-#banner img {
-    width: 100px;
-}
-
-#messages {
-    color: red;
+#container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
 }
 
 #main_content {
-    background: white;
+    background-color: white;
     padding: 20px;
-    margin-bottom: 20px;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    text-align: center;
 }
 
-form {
-    display: flex;
-    flex-direction: column;
+#banner {
+    margin-bottom: 20px;
+    text-align: center;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="password"],
-select {
+#banner h1 {
+    margin: 0;
+}
+
+#banner img {
+    width: 50px;
+    height: auto;
+}
+
+.userButton {
+    width: 100%;
     padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
+    margin: 5px 0;
+    border: 1px solid #ccc;
     border-radius: 4px;
 }
 
-input[type="submit"] {
-    background-color: #005b96;
-    color: white;
+#registerButton {
+    width: 100%;
     padding: 10px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    margin: 5px 0;
 }
 
-input[type="submit"]:hover {
+#registerButton:hover {
     background-color: #0056b3;
 }
 
-label {
-    margin: 10px 0;
+#backToLoginButton {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #6c757d;     color: white;
+    margin: 5px 0;
 }
 
-#footer {
-    text-align: center;
-    padding: 10px 0;
-    background-color: #A9D6E5;
-    border-radius: 0 0 8px 8px;
-}
+#backToLoginButton:hover {
+    background-color: #5a6268; }
 
-#main_page_link {
-    color: white;
-    text-decoration: none;
+
+#messages {
+    color: red;
+    margin-bottom: 10px;
 }

@@ -7,10 +7,7 @@
 </head>
 <body>
 <div id="container">
-    <div id="banner">
-        <h1><a id="main_page_link" href="/">Manga</a></h1>
-        <img src="/public/img/logo.svg" alt="logo">
-    </div>
+ 
     <div id="main_content">
         <div id="messages">
             <?php
@@ -25,10 +22,11 @@
             <input class="userButton" type="text" name="email" placeholder="email" required> <br>
             <input id="loginButton" type="submit" value="Zresetuj hasło">
         </form>
+        <div id="helper_buttons">
+            <a href="./login"><button id="backToLoginButton">Powrót do logowania</button></a>
+        </div>
     </div>
-    <div id="">
-        <p>Contact details: illiashenkoalex@gmail.com</p>
-    </div>
+    
 </div>
 </body>
 </html>
