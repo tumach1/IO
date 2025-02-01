@@ -20,8 +20,8 @@ class BookRepository extends \Repository
                 isbn as isbn,
                 liczba_str as pages,
                 oprawki.typ as binding,
-                JSON_ARRAYAGG(autorzy.imie) as authors,
-                JSON_ARRAYAGG(DISTINCT kategorie.kategoria) as genres,
+                json_agg(autorzy.imie) as authors,
+                json_agg(DISTINCT kategorie.kategoria) as genres,
                 img_path as imageUrl,
                 opis as description
             FROM ksiazki
@@ -39,20 +39,13 @@ class BookRepository extends \Repository
                                 ON ksiazki_autorzy.autor_id = autorzy.autor_id
             
             WHERE ksiazki.ksiazka_id = :id
-            GROUP BY ksiazki.ksiazka_id
+            GROUP BY ksiazki.ksiazka_id, oprawki.typ, ksiazki.tytul, ksiazki.podtytul, ksiazki.tytul_oryg, ksiazki.podtytul_oryg, ksiazki.isbn, ksiazki.liczba_str, ksiazki.img_path, ksiazki.opis
         ');
-        $stmt->bindParam(':id', $id);
+
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
 
-        $book = $stmt->fetch(PDO::FETCH_ASSOC);
-        if(!$book) {
-            return null;
-        }
-
-        $book['authors'] = json_decode($book['authors']);
-        $book['genres'] = json_decode($book['genres']);
-
-        return json_encode($book);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function getAllJsonData() {
@@ -66,8 +59,8 @@ class BookRepository extends \Repository
                 isbn as isbn,
                 liczba_str as pages,
                 oprawki.typ as binding,
-                JSON_ARRAYAGG(CONCAT(autorzy.imie, \' \', autorzy.nazwisko)) as authors,
-                JSON_ARRAYAGG(DISTINCT kategorie.kategoria) as genres,
+                json_agg(CONCAT(autorzy.imie, \' \', autorzy.nazwisko)) as authors,
+                json_agg(DISTINCT kategorie.kategoria) as genres,
                 img_path as imageUrl,
                 opis as description
             FROM ksiazki
@@ -84,7 +77,7 @@ class BookRepository extends \Repository
                      INNER JOIN autorzy
                                 ON ksiazki_autorzy.autor_id = autorzy.autor_id
             
-            GROUP BY ksiazki.ksiazka_id
+            GROUP BY ksiazki.ksiazka_id, oprawki.typ, ksiazki.tytul, ksiazki.podtytul, ksiazki.tytul_oryg, ksiazki.podtytul_oryg, ksiazki.isbn, ksiazki.liczba_str, ksiazki.img_path, ksiazki.opis
         ');
         $stmt->execute();
 
@@ -104,7 +97,7 @@ class BookRepository extends \Repository
     function borrowBook($bookId, $readerId): void
     {
         $stmt = Database::get()->prepare('
-        CALL wypozycz_ksiazke(:bookId, :readerId);
+        SELECT wypozycz_ksiazke(:bookId, :readerId);
         ');
         $stmt->bindParam(':bookId', $bookId);
         $stmt->bindParam(':readerId', $readerId);
@@ -112,7 +105,7 @@ class BookRepository extends \Repository
     }
 
     function getById($bookId){
-        $stmt = $stmt = $this->database->prepare('
+        $stmt = $this->database->prepare('
         SELECT ksiazka_id AS id, tytul AS title
         FROM ksiazki
         WHERE ksiazka_id = :id

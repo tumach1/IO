@@ -6,30 +6,29 @@ use models\Book;
 require_once 'Repository.php';
 require_once __DIR__.'/../models/Book.php';
 
-
-class OrderRepository extends \Repository{
+class OrderRepository extends \Repository {
     public function addOrder($readerId, $bookIds = []) {
         $stmt = $this->database->prepare('
                 INSERT INTO zamowienie (czytelnik_id)
                 VALUES (:readerId)
+                RETURNING zamowienie_id
             ');
-            $stmt->bindParam(':readerId', $readerId);
+        $stmt->bindParam(':readerId', $readerId);
+        $stmt->execute();
+        $orderId = $stmt->fetchColumn();
+        
+        foreach ($bookIds as $bookId) {
+            $stmt = $this->database->prepare('
+                INSERT INTO zamowienie_ksiazki (zamowienie_id, ksiazka_id)
+                VALUES (:orderId, :bookId)
+            ');
+            $stmt->bindParam(':orderId', $orderId);
+            $stmt->bindParam(':bookId', $bookId);
             $stmt->execute();
-            $orderId = $this->database->lastInsertId();
-            
-            foreach ($bookIds as $bookId) {
-                $stmt = $this->database->prepare('
-                    INSERT INTO zamowienie_ksiazki (zamowienie_id, ksiazka_id)
-                    VALUES (:orderId, :bookId)
-                ');
-                $stmt->bindParam(':orderId', $orderId);
-                $stmt->bindParam(':bookId', $bookId);
-                $stmt->execute();
-            }
+        }
     }
 
     public function getOrders($readerId) {
-
         $stmt = $this->database->prepare('
             SELECT zamowienie_id as id,
             status_id as statusId
@@ -43,13 +42,13 @@ class OrderRepository extends \Repository{
         for($i = 0; $i < count($zamowienie); $i++){
             $stmt = $this->database->prepare("
                 SELECT zk.zamowienie_id as order_id,
-				k.tytul as name,
-				CONCAT(a.imie, ' ',a.nazwisko) as author,
-				k.img_path as img_path
-				from zamowienie_ksiazki zk
-				JOIN ksiazki k on zk.ksiazka_id = k.ksiazka_id
-				LEFT JOIN ksiazki_autorzy ka on k.ksiazka_id = ka.ksiazka_id
-				JOIN autorzy a on ka.autor_id = a.autor_id
+                k.tytul as name,
+                CONCAT(a.imie, ' ',a.nazwisko) as author,
+                k.img_path as img_path
+                from zamowienie_ksiazki zk
+                JOIN ksiazki k on zk.ksiazka_id = k.ksiazka_id
+                LEFT JOIN ksiazki_autorzy ka on k.ksiazka_id = ka.ksiazka_id
+                JOIN autorzy a on ka.autor_id = a.autor_id
                 WHERE zk.zamowienie_id = :orderId
             ");
             $stmt->bindParam(':orderId', $zamowienie[$i]['id']);
@@ -96,7 +95,7 @@ class OrderRepository extends \Repository{
                 ksiazka_id as bookId
             FROM zamowienie
                      JOIN zamowienie_ksiazki
-                          ON zamowienie.zamowienie_id = zamowienie_ksiazka.zamowienie_id
+                          ON zamowienie.zamowienie_id = zamowienie_ksiazki.zamowienie_id
             WHERE czytelnik_id = :readerId
         ');
         $stmt->bindParam(':readerId', $readerId);
@@ -115,8 +114,8 @@ class OrderRepository extends \Repository{
                     isbn as isbn,
                     liczba_str as pages,
                     oprawki.typ as binding,
-                    JSON_ARRAYAGG(autorzy.imie) as authors,
-                    JSON_ARRAYAGG(DISTINCT kategorie.kategoria) as genres,
+                    json_agg(autorzy.imie) as authors,
+                    json_agg(DISTINCT kategorie.kategoria) as genres,
                     img_path as imageUrl,
                     opis as description
                 FROM ksiazki
@@ -134,64 +133,57 @@ class OrderRepository extends \Repository{
                                     ON ksiazki_autorzy.autor_id = autorzy.autor_id
                  
                 WHERE ksiazki.ksiazka_id = :bookId
-                GROUP BY ksiazki.ksiazka_id
+                GROUP BY ksiazki.ksiazka_id, oprawki.typ, ksiazki.tytul, ksiazki.podtytul, ksiazki.tytul_oryg, ksiazki.podtytul_oryg, ksiazki.isbn, ksiazki.liczba_str, ksiazki.img_path, ksiazki.opis
             ');
             $stmt->bindParam(':bookId', $order['bookId']);
             $stmt->execute();
 
             $book = $stmt->fetch(PDO::FETCH_ASSOC);
             $book['authors'] = json_decode($book['authors']);
-            $book['genres']
-            = json_decode($book['genres']);
+            $book['genres'] = json_decode($book['genres']);
             $ordersData[] = $book;
         }
         return json_encode($ordersData);
-    
     }
-
 
     public function getOrdersByStatus($status_id) {
-        
-        try{
+        try {
             $this->database->beginTransaction();
             
-        $stmt = $this->database->prepare('
-            SELECT zamowienie_id as id,
-                    czytelnik_id as user_id
-            FROM zamowienie
-            WHERE status_id = :status_id
-        ');
-        $stmt->bindParam(':status_id', $status_id);
-        $stmt->execute();
-        $zamowienie = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        for($i = 0; $i < count($zamowienie); $i++){
-            $stmt = $this->database->prepare("
-                SELECT zk.zamowienie_id as order_id,
-                k.tytul as name,
-                CONCAT(a.imie, ' ',a.nazwisko) as author,
-                k.img_path as img_path
-                from zamowienie_ksiazki zk
-                JOIN ksiazki k on zk.ksiazka_id = k.ksiazka_id
-                LEFT JOIN ksiazki_autorzy ka on k.ksiazka_id = ka.ksiazka_id
-                JOIN autorzy a on ka.autor_id = a.autor_id
-                WHERE zk.zamowienie_id = :orderId
-            ");
-            $stmt->bindParam(':orderId', $zamowienie[$i]['id']);
+            $stmt = $this->database->prepare('
+                SELECT zamowienie_id as id,
+                        czytelnik_id as user_id
+                FROM zamowienie
+                WHERE status_id = :status_id
+            ');
+            $stmt->bindParam(':status_id', $status_id);
             $stmt->execute();
-            $zamowienie[$i]['books'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-        }
-        $this->database->commit();
-        return $zamowienie;
-    } catch (Exception $e) {
-        $this->database->rollBack();
-        header('Content-Type: application/json');
-        echo json_encode(array("success" => false, "message" => "Error while adding order: " . $e->getMessage()));
-        throw new Exception("Error while adding order: " . $e->getMessage());
-    }
+            $zamowienie = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        
+            for($i = 0; $i < count($zamowienie); $i++){
+                $stmt = $this->database->prepare("
+                    SELECT zk.zamowienie_id as order_id,
+                    k.tytul as name,
+                    CONCAT(a.imie, ' ',a.nazwisko) as author,
+                    k.img_path as img_path
+                    from zamowienie_ksiazki zk
+                    JOIN ksiazki k on zk.ksiazka_id = k.ksiazka_id
+                    LEFT JOIN ksiazki_autorzy ka on k.ksiazka_id = ka.ksiazka_id
+                    JOIN autorzy a on ka.autor_id = a.autor_id
+                    WHERE zk.zamowienie_id = :orderId
+                ");
+                $stmt->bindParam(':orderId', $zamowienie[$i]['id']);
+                $stmt->execute();
+                $zamowienie[$i]['books'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }
+            $this->database->commit();
+            return $zamowienie;
+        } catch (Exception $e) {
+            $this->database->rollBack();
+            header('Content-Type: application/json');
+            echo json_encode(array("success" => false, "message" => "Error while adding order: " . $e->getMessage()));
+            throw new Exception("Error while adding order: " . $e->getMessage());
+        }
     }
 }
 ?>
