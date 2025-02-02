@@ -18,7 +18,7 @@
                 }
                 ?>
         </div>
-        <form action="" method="POST" class="flex-column-center-center">
+        <form action=""class="flex-column-center-center">
             <input class="userButton" type="text" name="email" placeholder="email" required> <br>
             <input id="loginButton" type="submit" value="Zresetuj hasło">
         </form>

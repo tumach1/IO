@@ -13,7 +13,7 @@
     <div class="root-div">
         <div class="page-div">
             <div class="top-panel">
-                <a href="../order_page/index.html">
+                <a href="/myorders">
                     <div class="top-orders-text">Orders</div>
                 </a>
                 <a href="/">
@@ -96,10 +96,6 @@
                         <span class="text">1234567898</span>
                     </div>
                 </span>
-            </div>
-            <div class="button-panel">
-                <a href="../orderPage?book_id=<?php echo $id; ?>" class="order-book-btn"><span>Order Book</span></a>
-                <a href="../orderPage" class="book-book-btn"><span>Book from 20.09</span></a>
             </div>
             <div class="description-panel">
                 <span class="description-text">Every day, more and more people want to learn some HTML and CSS. Joining the professional web designers and programmers are new audiences who need to know a little bit of code at work (update a content management system or e-commerce store) and those who want to make their personal blogs more attractive. Many books teaching HTML and CSS are dry and only written for those who want to become programmers, which is why this book takes an entirely new approach.</span>
