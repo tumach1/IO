@@ -52,7 +52,7 @@
 
             <div class="info-panel">
                 <span class="info-image">
-                    <img src="../img/placeholder-portrait.png" alt="">
+                    <img src="../public/img/placeholder-portrait.png" alt="">
                 </span>
                 <span class="info-data">
                     <div class="author">

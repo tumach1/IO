@@ -111,13 +111,13 @@ async function updateOrdersView() {
             div_header.innerHTML = `Order`;
             const div_status = document.createElement('div');
             div_status.classList.add('order-header-status');
-            div_status.innerHTML = `status: ${statuses[order.statusId]}`;
+            div_status.innerHTML = `status: ${statuses[order.statusid]}`;
             div_header.appendChild(div_status);
 
             const div_button = document.createElement('div');
             div_button.classList.add('received-order-button');
             div_button.innerHTML = `Return`;
-            if(order.statusId === 2) {
+            if(order.statusid == 2) {
             div_header.appendChild(div_button);
             }
 

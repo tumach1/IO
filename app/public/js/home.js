@@ -34,7 +34,7 @@ async function createOrder(user_id) {
         user_id: user_id,
         bookIds: cart.map(book => book.id),
     };
-    console.log(JSON.stringify(order));
+    
     try {
         const response = await fetch('/order', {
             method: 'POST',
@@ -43,21 +43,21 @@ async function createOrder(user_id) {
             },
             body: JSON.stringify(order),
         });
-        console.log(await response.text());
-        console.log("133");
+        
+        
         if (!response.ok) {
-            // console.log(response.data);
+            // 
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        console.log("response", response);
+        
         // const data = await response.json();
-        // console.log(data);
+        // 
         alert('Order created successfully');
         localStorage.removeItem('cart');
         updateCartView();
     } catch (error) {
-        console.log(error.message);
+        
         alert('Order creation failed');
 
 
@@ -71,6 +71,7 @@ async function GetAllBooks()
     {
         // try load data from local server
         let data = await DownloadJsonData("/books");
+        
         books_all = ParseJsonBooks(data);
     } catch (error)
     {
@@ -121,7 +122,6 @@ async function DownloadJsonData(url) {
         if (!response.ok) {
             throw new Error(`Failed to download ${url}. Status: ${response.status}`);
         }
-
         const jsonContent = await response.json();
         return jsonContent;
     } catch (error) {
@@ -136,6 +136,7 @@ function ParseJsonBooks(parsedData) {
     const bookInfos = [];
 
     for (const entry of parsedData) {
+
         const bookInfo = new BookInfo();
         bookInfo.id = entry.id || 0;
         bookInfo.title = entry.title || "No Name";
@@ -150,7 +151,7 @@ function ParseJsonBooks(parsedData) {
         bookInfo.authors = entry.authors || ["First Author", "Second Author"];
         bookInfo.rating = entry.rating || 100;
         bookInfo.genres = entry.genres || ["genre 1", "genre 2"];
-        bookInfo.imageUrl = entry.imageUrl || "";
+        bookInfo.imageUrl = entry.imageurl || "";
         bookInfo.copies = entry.copies || 0;
         bookInfo.binding = entry.binding || "";
         bookInfo.isbn = entry.isbn || 0;
@@ -190,6 +191,7 @@ function GetAuthorPageUrl(author)
 // Fill middle scroll book item with data
 function SetMiddleScrollPageData(page, book)
 {
+    
     // Set book page url link and set parameters sent to the page
     let a = page.querySelector(".img-container").parentNode;
     a.href = GetBookPageUrl(book);
@@ -203,7 +205,7 @@ function SetMiddleScrollPageData(page, book)
     let descriptionText = page.querySelector(".description-text");
     let nameText = page.querySelector(".name-text");
 
-
+    // console.warn(book)
     img.src = book.imageUrl;
     genreText.textContent = book.genres[0];
     descriptionText.textContent = book.description;
@@ -222,7 +224,7 @@ function SetBottomScrollPageData(page, book)
 
     // Set author url link
     let author_a = page.querySelector(".bot-scrl-author").parentNode;
-    author_a.href = GetAuthorPageUrl(book.authors[0]);
+    
 
 
     let img = page.querySelector(".bot-scrl-img");
@@ -574,13 +576,13 @@ function InitBookListScroll()
 function CheckBotScrollPosition(forcedAdd = false)
 {
     const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-    // console.log(scrollTop + " " + scrollHeight + " " + clientHeight);
+    // 
 
     // let lastBookEnd = bot_scrl_line.offsetTop + bot_scrl_panel.offsetTop;
 
     if (forcedAdd || (scrollHeight <= clientHeight + scrollTop))
     {
-        // console.log(lastBookEnd);
+        // 
         if (AddBotScrollBooks(10))
         {
             CheckBotScrollPosition();
@@ -840,7 +842,7 @@ function addToCart(bookId) {
     let bookInfo = books_all.find(book => book.id == bookId);
     // Dodaj książkę do koszyka
     const book = { id: bookId, name: bookInfo.title, author: bookInfo.authors[0] };
-    console.log(book);
+    
     cart.push(book);
 
     // Zapisz koszyk w LocalStorage

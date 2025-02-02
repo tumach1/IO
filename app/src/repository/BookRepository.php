@@ -10,7 +10,7 @@ require_once __DIR__.'/../models/Author.php';
 class BookRepository extends \Repository
 {
     public function getJsonData($id) {
-        $stmt = $this->database->prepare('
+        $stmt = $this->database->prepare("
             SELECT
                 ksiazki.ksiazka_id as id,
                 tytul as title,
@@ -20,7 +20,7 @@ class BookRepository extends \Repository
                 isbn as isbn,
                 liczba_str as pages,
                 oprawki.typ as binding,
-                json_agg(autorzy.imie) as authors,
+                json_agg(autorzy.imie || ' ' || autorzy.nazwisko) as authors,
                 json_agg(DISTINCT kategorie.kategoria) as genres,
                 img_path as imageUrl,
                 opis as description
@@ -40,12 +40,12 @@ class BookRepository extends \Repository
             
             WHERE ksiazki.ksiazka_id = :id
             GROUP BY ksiazki.ksiazka_id, oprawki.typ, ksiazki.tytul, ksiazki.podtytul, ksiazki.tytul_oryg, ksiazki.podtytul_oryg, ksiazki.isbn, ksiazki.liczba_str, ksiazki.img_path, ksiazki.opis
-        ');
+        ");
 
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
-
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $data;
     }
 
     public function getAllJsonData() {
@@ -59,7 +59,7 @@ class BookRepository extends \Repository
                 isbn as isbn,
                 liczba_str as pages,
                 oprawki.typ as binding,
-                json_agg(CONCAT(autorzy.imie, \' \', autorzy.nazwisko)) as authors,
+                json_agg(autorzy.imie || \' \' || autorzy.nazwisko) as authors,
                 json_agg(DISTINCT kategorie.kategoria) as genres,
                 img_path as imageUrl,
                 opis as description
