@@ -193,10 +193,12 @@
 
           <div class="book-list-title">
             <div class="bot-scrl-div-name"><div class="text-wrapper-3">Title</div></div>
+
+            <!-- <div class="bot-scrl-div-author"><div class="text-wrapper-3"></div></div> -->
             <div class="bot-scrl-div-author"><div class="text-wrapper-3">Author</div></div>
+
+            <!-- <div class="bot-scrl-div-author"><div class="text-wrapper-3"></div></div> -->
             <div class="bot-scrl-div-genre"><div class="text-wrapper-3">Category</div></div>
-            <div class="bot-scrl-div-opportunity"><div class="text-wrapper-3">Opportunities</div></div>
-            <div class="bot-scrl-div-status"><div class="text-wrapper-3">Status</div></div>
             <div class="bot-scrl-div-action"><div class="text-wrapper-3">Action</div></div>
           </div>
 
@@ -219,12 +221,9 @@
               <div class="bot-scrl-div-genre">
                 <div class="genre-frame"><div class="genre-text bot-scrl-genre">Fiction</div></div>
               </div>
-              <div class="bot-scrl-div-opportunity"><div class="text-wrapper bot-scrl-opportunity">can buy</div></div>
-              <div class="bot-scrl-div-status"><div class="text-wrapper bot-scrl-status">Booked</div></div>
-              <div class="bot-scrl-action">
               
               <div class="action" data-id="1" onclick="addToCart(this.getAttribute('data-id'));">
-            <div class="action-2 bot-scrl-action .add-to-cart-btn">Dodaj do koszyka</div>
+            <div class="action-2 bot-scrl-action .add-to-cart-btn">Do koszyka</div>
         </div>
                 
               </div>
